@@ -1,4 +1,3 @@
-
 <?php
 
   $nav_selected = "CAPACITY"; // set the current page; options: TRAINS, ORG, CAPACITY, TRAINING, REPORTS, SETUP, LOGIN, HELP, SEARCH
@@ -12,24 +11,17 @@
   <div class="right-content">
     <div class="container">
 
-        <h3>Capacity Roll Up</h3>
+        <h3 style = "color: #01B0F1;">Capacity Roll Up</h3>
 		<p><b>For The Entire Program Increment PI-200 = 5500 Story Points</b></p>
 		
-		<div>Show
-		<select name="Show" size="1">
-		<option value="" selected="selected">5</option>
-		<option value="">10</option>
-		<option value="">15</option>
-		<option value="">20</option>
-		</select>Entries
-		</div>
+		
 		
 	
 		<table id="info" cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered datatable-style"
                width="100%" style="width: 100px;">
                <thead>
                  <tr id="table-first-row">
-                   <<th>Type</th>
+                   <th>Type</th>
                    <th>ID</th>
                    <th>Name</th>
                    <th>Scrum Master /RTE /STE</th>
@@ -47,7 +39,7 @@
 			   
 				<?php
 
-                  $sql = "SELECT * from trains_and_teams";
+                  $sql = "select type, team_id, team_name, role, iteration_1, iteration_2, iteration_3, iteration_4, iteration_5, iteration_6, (iteration_1 + iteration_2 + iteration_3 + iteration_4 + iteration_5 + iteration_6) as total from trains_and_teams natural join cadence natural join capacity natural join membership where type = 'AT'  ";
                   $result = run_sql($sql);
 
                   if($result -> num_rows > 0){
@@ -55,10 +47,17 @@
 
                       echo
                       "<tr>
-                        <td>" . $row["type"] . "</td>
+                        <td >" . $row["type"] . "</td>
                         <td>" .$row["team_id"] ."</td>
-                        <td>" .$row["name"] . "</td>
-                        <td>" .$row["parent"] ."</td>
+                        <td>" .$row["team_name"] . "</td>
+						<td>" .$row["role"] ."</td>
+                        <td>" .$row["iteration_1"] ."</td>
+						<td>" .$row["iteration_2"] ."</td>
+						<td>" .$row["iteration_3"] ."</td>
+						<td>" .$row["iteration_4"] ."</td>
+						<td>" .$row["iteration_5"] ."</td>
+						<td>" .$row["iteration_6"] ."</td>
+						<td>" .$row["total"] ."</td>
                       </tr>";
                     }
 
