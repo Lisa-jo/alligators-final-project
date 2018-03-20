@@ -181,7 +181,7 @@
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
 
-                if (isset($teamcapacity)  && !isset($_POST['restore'])  && !isset($_POST['submit'])){
+                if (isset($teamcapacity)  && !isset($_POST['restore'])  && !isset($_POST['submit0'])){
                   $icapacity = array_sum($teamcapacity);
                   $totalcapacity = $row["total"] + ($icapacity - $row["iteration_".substr($iteration, -1)]);
                 }else{
@@ -257,17 +257,17 @@
                     $row2 = $result2->fetch_assoc();
 
                 }
-                if (isset($teamcapacity[$rownum]) && !isset($_POST['restore']) && !isset($_POST['submit'])){
+                if (isset($teamcapacity[$rownum]) && !isset($_POST['restore']) && !isset($_POST['submit0'])){
                   $storypts = $teamcapacity[$rownum];
                 }else{
                   $storypts = round(($duration-0)*((100-$overhead_percentage)/100)*($row2["value"]/100));
                 }
-                if (isset($daysoff[$rownum]) && !isset($_POST['restore'])  && !isset($_POST['submit'])){
+                if (isset($daysoff[$rownum]) && !isset($_POST['restore'])  && !isset($_POST['submit0'])){
                   $doff = $daysoff[$rownum];
                 } else {
                   $doff = 0;
                 }
-                if (isset($velocity[$rownum]) && !isset($_POST['restore']) && !isset($_POST['submit'])){
+                if (isset($velocity[$rownum]) && !isset($_POST['restore']) && !isset($_POST['submit0'])){
                   $vel = $velocity[$rownum];
                 } else {
                   $vel = $row2["value"];
