@@ -47,10 +47,16 @@
 
                   $sql2 = "SELECT * FROM membership WHERE team_id='".$row["team_id"]."'";
                   $result2 = run_sql($sql2);
-                  $smast = "";
-                  while ($row2 = $result2->fetch_assoc()) {
-                    $smast = $smast . $row2["first_name"] . "&nbsp;" . $row2["last_name"] . ",<br/>";
-                  }
+                  $smast = ""; $pown = "";
+                  if ($result->num_rows > 0) {
+                    while ($row2 = $result2->fetch_assoc()) {
+                      if ($row2["role"] == "Scrum Master (SM)"){
+                        $smast = $smast . $row2["first_name"] . "&nbsp;" . $row2["last_name"] . ",<br/>";
+                      } else if ($row2["role"] == "Product Owner (PO)"){
+                        $pown = $pown . $row2["first_name"] . "&nbsp;" . $row2["last_name"] . ",<br/>";
+                      }
+                    }
+                  } else {}
 
                     echo
                     "<tr>
@@ -58,7 +64,7 @@
                         <td>" . $row["team_id"] . "</td>
                         <td>" . $row["name"] . "</td>
                         <td>" . $smast . "</td>
-            						<td>" . $row["PMPO"] . "</td>
+            						<td>" . $pown . "</td>
                         <td>" . $row["parent"] . "</td>
                     </tr>";
                 }
