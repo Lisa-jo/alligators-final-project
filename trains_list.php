@@ -9,7 +9,7 @@
 <div class="right-content">
     <div class="container">
 
-        <h3><img src="images/image16.png" style="max-height: 35px;" /> Solution Trains (ST), <img src="images/image17.png" style="max-height: 35px;" />Agile Release Trains (ART), <img src="images/image20.png" style="max-height: 35px;" />Agile Teams (AT)</h3>
+        <h3><img src="images/solution_train.png" style="max-height: 35px;" /> Solution Trains (ST), <img src="images/image17.png" style="max-height: 35px;" />Agile Release Trains (ART), <img src="images/image20.png" style="max-height: 35px;" />Agile Teams (AT)</h3>
 
         <table id="info" cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered datatable-style"
                width="100%" style="width: 100px;">
