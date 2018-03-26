@@ -62,9 +62,7 @@ require 'db_configuration.php';
             <a href=""><li <?php if($nav_selected == "HELP"){ echo 'class="current-page"'; } ?>><img src="./images/image8.png"><br/>Help</li></a>
 		<li class="horozontal-li-search" <?php if($nav_selected == "SEARCH"){ echo 'class="current-page"'; } ?>>     
 			<div>
-				<input type="text" id="search" name="search" style="height:40px; margin-top:10px;">
-				<img src="./images/Search3.png" width=50 style="position:absolute; top:6px; right:-2px;">
-
+				<input type="text" id="searchInput" placeholder=" " title="Type in a name">
 			</div><br/>
 		</li>
         </ul>
