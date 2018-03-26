@@ -259,7 +259,6 @@ a {
   padding: 5px 0 5px 0;
   margin: -15px 0 0 0;
   text-align: center;
-  width: 160px;
   text-shadow: -1px 0 #007030,0 1px #007030,1px 0 #007030,0 -1px #007030;
 }
 
@@ -273,7 +272,6 @@ a {
   font-size: 20px;
   margin-right: 10px;
 }
-
 
 #capacity-button-blue:hover {
   background: #1CC6FF;

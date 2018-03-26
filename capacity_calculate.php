@@ -8,7 +8,7 @@
 
   date_default_timezone_set('America/Chicago');
 
-  $sql = "SELECT program_increment, iteration
+  $sql = "SELECT program_increment, iteration, sequence
           FROM `cadence`
           WHERE start_date <= '" . date("Y-m-d") . "'
           AND end_date >= '". date("Y-m-d") . "';";
@@ -17,6 +17,7 @@
     $row = $result->fetch_assoc();
     $program_increment = $row["program_increment"];
     $iteration = $row["iteration"];
+    $sequence = $row["sequence"];
     $result->close();
   } else {
     //echo "In-between Iterations";
@@ -43,6 +44,39 @@
     $result->close();
   }
 
+  if (isset($_POST['current-sequence'])) {
+    $sequence = $_POST['current-sequence'];
+
+  }
+
+  if (isset($_POST['showNext'])) {
+    $sequence++;
+    $sql = "SELECT program_increment, iteration, sequence
+            FROM `cadence`
+            WHERE sequence='".$sequence."';";
+    $result = run_sql($sql);
+    if ($result->num_rows > 0) {
+      $row = $result->fetch_assoc();
+      $program_increment = $row["program_increment"];
+      $iteration = $row["iteration"];
+      $sequence = $row["sequence"];
+      $result->close();
+    }
+  }
+
+  $sql5 = "SELECT * FROM `cadence` WHERE program_increment='".$program_increment."';";
+  $result5 = run_sql($sql5);
+  if ($result5->num_rows > 0) {
+      $row5 = $result5->fetch_assoc();
+      $duration = $row5["duration"];
+  }
+  $sql6 = "SELECT * FROM `preferences` WHERE name='OVERHEAD_PERCENTAGE';";
+  $result6 = run_sql($sql6);
+  if ($result6->num_rows > 0) {
+      $row6 = $result6->fetch_assoc();
+      $overhead_percentage = $row6["value"];
+  }
+
   if (isset($_POST['select-team'])) {
     $selected_team = $_POST['select-team'];
   } else {
@@ -54,6 +88,42 @@
         $row = $result->fetch_assoc();
         $selected_team = $row["team_id"];
     }
+  }
+
+  if (isset($_POST['current-team-selected'])) {
+    $selected_team = $_POST['current-team-selected'];
+
+  }
+
+  if (isset($_POST['submit0'])) {
+    $iterationcapacity = 0;
+    for ($x=0; $x < count($_POST['rownum']); $x++){
+      $teamcapacity[$_POST['rownum'][$x]] = round(($duration-$_POST['daysoff'][$x])*((100-$overhead_percentage)/100)*($_POST['velocity'][$x]/100));
+      $iterationcapacity += $teamcapacity[$_POST['rownum'][$x]];
+      $daysoff[$_POST['rownum'][$x]] = $_POST['daysoff'][$x];
+      $velocity[$_POST['rownum'][$x]] = $_POST['velocity'][$x];
+    }
+    $sqliter = "UPDATE `capacity` SET iteration_".substr($iteration, -1)."='".$iterationcapacity."' WHERE program_increment='".$program_increment."' AND team_id='".$selected_team."';";
+    $result_iter = run_sql($sqliter);
+    $sqlinc = "SELECT (iteration_1 + iteration_2 + iteration_3 + iteration_4 + iteration_5 + iteration_6) as new_total FROM `capacity` WHERE program_increment='".$program_increment."' AND team_id='".$selected_team."';";
+    $result_inc = run_sql($sqlinc);
+    if ($result_inc->num_rows > 0) {
+        $rowinc = $result_inc->fetch_assoc();
+        $pi_capacity = $rowinc["new_total"];
+      }
+    $sqlup = "UPDATE `capacity` SET total='$pi_capacity' WHERE program_increment='".$program_increment."' AND team_id='".$selected_team."';";
+    $result_up = run_sql($sqlup);
+  }
+
+  if (isset($_POST['daysoff']) && isset($_POST['velocity']) && !isset($_POST['submit0'])) {
+    $iterationcapacity = 0;
+    for ($x=0; $x < count($_POST['rownum']); $x++){
+      $teamcapacity[$_POST['rownum'][$x]] = round(($duration-$_POST['daysoff'][$x])*((100-$overhead_percentage)/100)*($_POST['velocity'][$x]/100));
+      $iterationcapacity += $teamcapacity[$_POST['rownum'][$x]];
+      $daysoff[$_POST['rownum'][$x]] = $_POST['daysoff'][$x];
+      $velocity[$_POST['rownum'][$x]] = $_POST['velocity'][$x];
+    }
+
   }
 
   ?>
@@ -97,45 +167,35 @@
           <?php
             echo "&nbsp;".$program_increment."<br/>";
             echo "&nbsp;".$iteration."<br/>";
-            $sql5 = "SELECT * FROM `cadence` WHERE program_increment='".$program_increment."';";
-
-            $result5 = run_sql($sql5);
-
-
-            if ($result5->num_rows > 0) {
-                $row5 = $result5->fetch_assoc();
-                $duration = $row5["duration"];
-            }
             echo "&nbsp;".$duration."<br/>";
-            $sql6 = "SELECT * FROM `preferences` WHERE name='OVERHEAD_PERCENTAGE';";
-            $result6 = run_sql($sql6);
-
-            if ($result6->num_rows > 0) {
-
-                $row6 = $result6->fetch_assoc();
-                $overhead_percentage = $row6["value"];
-            }
             echo "&nbsp;".$overhead_percentage."%<br/>";
           ?>
           </td>
           <td width="50%"  style="font-weight: bold;">
             <?php
-            $sql = "SELECT iteration_1, total FROM `capacity` WHERE program_increment='".$program_increment."' AND team_id='".$selected_team."'";
+            $sql = "SELECT * FROM `capacity` WHERE program_increment='".$program_increment."' AND team_id='".$selected_team."'";
 
             $result = run_sql($sql);
 
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                $icapacity = $row["iteration_1"];
-                $totalcapacity = $row["total"];
+
+                if (isset($teamcapacity)  && !isset($_POST['restore'])  && !isset($_POST['submit0'])){
+                  $icapacity = array_sum($teamcapacity);
+                  $totalcapacity = $row["total"] + ($icapacity - $row["iteration_".substr($iteration, -1)]);
+                }else{
+                  $icapacity = $row["iteration_".substr($iteration, -1)];
+                  $totalcapacity = $row["total"];
+                }
+
             }
              ?>
-             <div style="float: right; width: 160px; margin-right: 10px; text-align: center; font-size: 12px;">
+             <div style="float: right; margin-right: 10px; text-align: center; font-size: 12px;">
                <div id="capacity-calc-bignum"><?php echo $totalcapacity ?></div>
                Total Capacity for the Program Increment
              </div>
-            <div style="float: right; width: 160px; margin-right: 10px; text-align: center; font-size: 12px;">
+            <div style="float: right; margin-right: 10px; text-align: center; font-size: 12px;">
               <div id="capacity-calc-bignum"><?php echo $icapacity ?></div>
               Total Capacity for this Iteration
             </div>
@@ -144,7 +204,7 @@
         <tr>
           <td colspan="3">
 
-        <form type="post" action="#">
+        <form method="post" action="#" id="maincap">
       <table id="info" cellpadding="2px" cellspacing="0" border="0" class="capacity-table"
              width="100%" style="width: 100px; clear: both; font-size: 15px;">
 
@@ -178,7 +238,7 @@
           if ($result->num_rows > 0) {
 
               // output data of each
-
+              $rownum = 0;
               while ($row = $result->fetch_assoc()) {
 
                 if ($row["role"] == "Scrum Master (SM)") {
@@ -197,16 +257,33 @@
                     $row2 = $result2->fetch_assoc();
 
                 }
+                if (isset($teamcapacity[$rownum]) && !isset($_POST['restore']) && !isset($_POST['submit0'])){
+                  $storypts = $teamcapacity[$rownum];
+                }else{
+                  $storypts = round(($duration-0)*((100-$overhead_percentage)/100)*($row2["value"]/100));
+                }
+                if (isset($daysoff[$rownum]) && !isset($_POST['restore'])  && !isset($_POST['submit0'])){
+                  $doff = $daysoff[$rownum];
+                } else {
+                  $doff = 0;
+                }
+                if (isset($velocity[$rownum]) && !isset($_POST['restore']) && !isset($_POST['submit0'])){
+                  $vel = $velocity[$rownum];
+                } else {
+                  $vel = $row2["value"];
+                }
 
                   echo
                   "<tr>
                       <td id='capacity-table-td' style='font-weight:500;'>" . $row["last_name"] . "</td>
                       <td id='capacity-table-td' style='font-weight:500;'>" . $row["first_name"] . "</td>
                       <td id='capacity-table-td' style='font-weight:500;'>" . $row["role"] . "</td>
-                      <td id='capacity-table-td' style='font-weight:500; text-align: center;'><input class='capacity-text-input' type='text' name='storypoints' value='" . $row2["value"] . "' /> %</td>
-                      <td id='capacity-table-td' style='font-weight:500; text-align: center;'><input class='capacity-text-input' type='text' name='daysoff' value='0' /></td>
-                      <td id='capacity-table-td' style='font-weight:500; text-align: center; background: #e9e9e9;'><input class='capacity-text-input' style='background: #e9e9e9;' type='text' name='storypoints' value='0' />&nbsp;pts</td>
+                      <td id='capacity-table-td' style='font-weight:500; text-align: center;'><input id='autoin' class='capacity-text-input' type='text' name='velocity[]' value='" . $vel . "' onchange='autoForm();' /> %</td>
+                      <td id='capacity-table-td' style='font-weight:500; text-align: center;'><input id='autoin2' class='capacity-text-input' type='text' name='daysoff[]' value='".$doff."' onchange='autoForm();' /></td>
+                      <td id='capacity-table-td' style='font-weight:500; text-align: center; background: #e9e9e9;'>".$storypts."&nbsp;pts</td>
+                      <input type='hidden' name='rownum[]' value='".$rownum."'/>
                   </tr>";
+                  $rownum++;
               }
           } else {
               echo "0 results";
@@ -267,10 +344,11 @@
           </tfoot>
 
       </table>
-      <input type="submit" id="capacity-button-blue" name="submit" value="Submit">
+      <input type="submit" id="capacity-button-blue" name="submit0" value="Submit">
       <input type="submit" id="capacity-button-blue" name="restore" value="Restore Defaults">
       <input type="submit" id="capacity-button-blue" name="showNext" value="Show Next Iteration">
-
+        <input type="hidden" name="current-team-selected" value="<?php echo $selected_team; ?>">
+        <input type="hidden" name="current-sequence" value="<?php echo $sequence; ?>">
       </form>
 
       <div id="capacity-footnote">
@@ -300,6 +378,11 @@
             });
 
         });
+
+        function autoForm() {
+          document.getElementById('maincap').submit();
+        }
+
 
     </script>
 

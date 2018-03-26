@@ -64,6 +64,7 @@ require 'db_configuration.php';
 			<div>
 				<input type="text" id="search" name="search" style="height:40px; margin-top:10px;">
 				<img src="./images/Search3.png" width=50 style="position:absolute; top:6px; right:-2px;">
+
 			</div><br/>
 		</li>
         </ul>

@@ -9,7 +9,7 @@
 <div class="right-content">
     <div class="container">
 
-        <h3><img src="images/image16.png" style="max-height: 35px;" /> Solution Trains (ST), <img src="images/image17.png" style="max-height: 35px;" />Agile Release Trains (ART), <img src="images/image20.png" style="max-height: 35px;" />Agile Teams (AT)</h3>
+        <h3><img src="images/solution_train.png" style="max-height: 35px;" /> Solution Trains (ST), <img src="images/image17.png" style="max-height: 35px;" />Agile Release Trains (ART), <img src="images/image20.png" style="max-height: 35px;" />Agile Teams (AT)</h3>
 
         <table id="info" cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered datatable-style"
                width="100%" style="width: 100px;">
@@ -47,10 +47,16 @@
 
                   $sql2 = "SELECT * FROM membership WHERE team_id='".$row["team_id"]."'";
                   $result2 = run_sql($sql2);
-                  $smast = "";
-                  while ($row2 = $result2->fetch_assoc()) {
-                    $smast = $smast . $row2["first_name"] . "&nbsp;" . $row2["last_name"] . ",<br/>";
-                  }
+                  $smast = ""; $pown = "";
+                  if ($result->num_rows > 0) {
+                    while ($row2 = $result2->fetch_assoc()) {
+                      if ($row2["role"] == "Scrum Master (SM)"){
+                        $smast = $smast . $row2["first_name"] . "&nbsp;" . $row2["last_name"] . ",<br/>";
+                      } else if ($row2["role"] == "Product Owner (PO)"){
+                        $pown = $pown . $row2["first_name"] . "&nbsp;" . $row2["last_name"] . ",<br/>";
+                      }
+                    }
+                  } else {}
 
                     echo
                     "<tr>
@@ -58,7 +64,7 @@
                         <td>" . $row["team_id"] . "</td>
                         <td>" . $row["name"] . "</td>
                         <td>" . $smast . "</td>
-            						<td>" . $row["PMPO"] . "</td>
+            						<td>" . $pown . "</td>
                         <td>" . $row["parent"] . "</td>
                     </tr>";
                 }
