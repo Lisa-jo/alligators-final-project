@@ -60,7 +60,12 @@ require 'db_configuration.php';
             <a href="import_csv.php"><li <?php if($nav_selected == "SETUP"){ echo 'class="current-page"'; } ?>><img src="./images/image3.png"><br/>Setup</li></a>
             <a href=""><li <?php if($nav_selected == "LOGIN"){ echo 'class="current-page"'; } ?>><img src="./images/image7.png"><br/>Login</li></a>
             <a href=""><li <?php if($nav_selected == "HELP"){ echo 'class="current-page"'; } ?>><img src="./images/image8.png"><br/>Help</li></a>
-            <a href=""><li class="horozontal-li-search"  <?php if($nav_selected == "SEARCH"){ echo 'class="current-page"'; } ?>><img src="./images/image9.png"><br/></li></a>
+		<li class="horozontal-li-search" <?php if($nav_selected == "SEARCH"){ echo 'class="current-page"'; } ?>>     
+			<div>
+				<input type="text" id="search" name="search" style="height:40px; margin-top:10px;">
+				<img src="./images/Search3.png" width=50 style="position:absolute; top:6px; right:-2px;">
+			</div><br/>
+		</li>
         </ul>
       <br />
     </div>
