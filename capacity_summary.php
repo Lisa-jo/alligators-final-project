@@ -6,17 +6,12 @@
 
   include("./nav.php"); ?>
   
-  
-  
   <div class="right-content">
     <div class="container">
 
         <h3 style = "color: #01B0F1;">Capacity Roll Up</h3>
 		<p><b>For The Entire Program Increment PI-200 = 5500 Story Points</b></p>
 		
-		
-		
-	
 		<table id="info" cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered datatable-style"
                width="100%" style="width: 100px;">
                <thead>
@@ -24,7 +19,7 @@
                    <th>Type</th>
                    <th>ID</th>
                    <th>Name</th>
-                   <th>Scrum Master /RTE /STE</th>
+                   <th>Scrum Master / RTE / STE</th>
                    <th>PI200-1</th>
                    <th>PI200-2</th>
                    <th>PI200-3</th>
@@ -39,18 +34,60 @@
 			   
 				<?php
 
-                  $sql = "select type, team_id, team_name, role, iteration_1, iteration_2, iteration_3, iteration_4, iteration_5, iteration_6, (iteration_1 + iteration_2 + iteration_3 + iteration_4 + iteration_5 + iteration_6) as total from trains_and_teams natural join cadence natural join capacity natural join membership where type = 'AT'  ";
+                  $sql = "SELECT a.team_id, type, name, CONCAT(first_name, ' ', last_name) AS sm_name, iteration_1, iteration_2, iteration_3, iteration_4, iteration_5, iteration_6, total FROM
+							(
+								SELECT `trains_and_teams`.team_id, type, name, iteration_1, iteration_2, iteration_3, iteration_4, iteration_5, iteration_6, total from `trains_and_teams` LEFT JOIN 
+									(
+										SELECT * FROM `capacity` where program_increment='pi-100'
+									) AS b
+								ON `trains_and_teams`.`team_id` = b.`team_id` 
+							) AS a
+						JOIN `membership` WHERE `membership`.role='Scrum Master (SM)' GROUP BY team_id";
                   $result = run_sql($sql);
 
                   if($result -> num_rows > 0){
                     while($row = $result -> fetch_assoc()){
-
+						if ($row["iteration_1"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["iteration_1"];
+						}
+						if ($row["iteration_2"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["iteration_2"];
+						}
+						if ($row["iteration_3"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["iteration_3"];
+						}
+						if ($row["iteration_4"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["iteration_4"];
+						}
+						if ($row["iteration_5"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["iteration_5"];
+						}
+						if ($row["iteration_6"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["iteration_6"];
+						}
+						if ($row["total"] == "null"){
+							$parent = "--";
+						} else {
+							$parent = $row["total"];
+						}
                       echo
                       "<tr>
                         <td >" . $row["type"] . "</td>
                         <td>" .$row["team_id"] ."</td>
-                        <td>" .$row["team_name"] . "</td>
-						<td>" .$row["role"] ."</td>
+                        <td>" .$row["name"] . "</td>
+						<td>" .$row["sm_name"] ."</td>
                         <td>" .$row["iteration_1"] ."</td>
 						<td>" .$row["iteration_2"] ."</td>
 						<td>" .$row["iteration_3"] ."</td>
@@ -68,28 +105,12 @@
 
                   $result->close();
 
-
                  ?>
-
-
-
-
                </tbody>
-
-                 
 		</table>
-		
-		
-		
-		
-     
-      
 		<input type = "submit" id="capacity-button-blue" value = "Show Previous PI">
 		<input type = "submit" id="capacity-button-blue" value = "Show Next PI">
 		
-  
-  
-  
     <script type="text/javascript">
 
          $(document).ready(function () {
